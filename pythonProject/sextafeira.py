@@ -3,6 +3,8 @@ import speech_recognition as sr
 import webbrowser
 import pyttsx3
 import os.path
+import requests
+import json
 from datetime import datetime
 
 import python_weather
@@ -68,23 +70,20 @@ with sr.Microphone(1) as source:
                 resposta = res.lower()
                 print("Texto reconhecido: ", resposta)
 
-                if "youtube" in resposta:
-                    abrirWebsite(resposta, 'https://www.youtube.com/')
-
                 if "notícias" in resposta:
                     abrirWebsite(resposta, 'https://g1.globo.com/sp/sao-paulo/')
+                    break
 
                 if "que horas são" in resposta:
                     robo.say(hora)
                     print(hora)
                     robo.runAndWait()
+                    break
 
                 if "temperatura atual" in resposta:
                     loop = asyncio.get_event_loop()
                     loop.run_until_complete(pegarTemperatura())
-                    # robo.say(pegarTemperatura())
-                    #print(str(pegarTemperatura()))
-                    # robo.runAndWait()
+                    break
 
                 if "cadastrar evento" in resposta:
                     fala = "Ok, qual evento devo cadastrar?"
@@ -119,11 +118,48 @@ with sr.Microphone(1) as source:
                             line = line.strip()  # preprocess line
                             robo.say(line)
                             robo.runAndWait()
+                        break
 
-                if "assuntos do momento" in resposta:
-                    robo.say("Mostrando as trendings")
+                if "dólar atual" in resposta:
+                    requisicao = requests.get('https://economia.awesomeapi.com.br/all/USD-BRL')
+                    cotacao = requisicao.json()
+
+                    print('#### Cotação do Dolar ####')
+                    print('Moeda: ' + cotacao['USD']['name'])
+                    print('Data: ' + cotacao['USD']['create_date'])
+                    valor = 'Valor atual: R$' + cotacao['USD']['bid']
+                    robo.say(valor)
+                    print(valor)
                     robo.runAndWait()
-                    webbrowser.open('https://twitter.com/explore/tabs/trending', autoraise=True)
+                    break
+
+                if "calculadora" in resposta:
+                    while True:
+                        try:
+                            print("O que deseja calcular?")
+                            audio = recon.listen(source)
+
+                            contatxt = recon.recognize_google(audio, language='pt')
+                            print("Texto reconhecido: '", contatxt)
+
+                            if contatxt == "fechar":
+                                break
+                            conta = contatxt.split()
+
+                            if conta[1] == "+":
+                                print("Resultado: ", contatxt, " = ", str(int(conta[0]) + int(conta[2])))
+
+                            elif conta[1] == "-":
+                                print("Resultado: ", contatxt, " = ", str(int(conta[0]) - int(conta[2])))
+
+                            elif conta[1] == "/":
+                                print("Resultado: ", contatxt, " = ", str(int(conta[0]) / int(conta[2])))
+
+                            elif conta[1] == "x":
+                                print("Resultado: ", contatxt, " = ", str(int(conta[0]) * int(conta[2])))
+                        except:
+                            print('Alguma coisa bugou')
+                            break
 
                 elif "parar" in resposta:
                     robo.say("OK! Até mais tarde senhor!")
