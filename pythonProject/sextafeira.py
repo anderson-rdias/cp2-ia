@@ -55,8 +55,8 @@ with sr.Microphone(1) as source:
 
         if resposta == "ok sexta-feira":
             robo = pyttsx3.init()
-            robo.say("Olá mestre seja bem vindo, o que deseja?")
-            print("Olá mestre seja bem vindo, o que deseja?")
+            robo.say("Sim mestre. O que devo fazer?")
+            print("Sim mestre. O que devo fazer?")
             robo.setProperty("voice", b'brasil')
             robo.setProperty('rate', 140)
             robo.setProperty('volume', 1)
@@ -85,7 +85,7 @@ with sr.Microphone(1) as source:
                     loop.run_until_complete(pegarTemperatura())
                     break
 
-                if "cadastrar evento" in resposta:
+                if "cadastrar evento na agenda" in resposta:
                     fala = "Ok, qual evento devo cadastrar?"
                     robo.say(fala)
                     print(fala)
@@ -136,6 +136,8 @@ with sr.Microphone(1) as source:
                 if "calculadora" in resposta:
                     while True:
                         try:
+                            fala = "O que deseja calcular?"
+                            robo.say(fala)
                             print("O que deseja calcular?")
                             audio = recon.listen(source)
 
